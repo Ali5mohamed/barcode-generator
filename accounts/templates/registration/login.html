@@ -1,0 +1,73 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+{% load widget_tweaks %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+
+            <!-- Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h3 class="card-title mb-4 text-center">تسجيل الدخول</h3>
+
+                    <!-- Errors -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            اسم المستخدم أو كلمة المرور غير صحيحة. حاول مرة أخرى.
+                        </div>
+                    {% endif %}
+
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                            <div class="alert alert-warning">
+                                حسابك لا يملك صلاحية الدخول لهذه الصفحة.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                الرجاء تسجيل الدخول للوصول لهذه الصفحة.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- Login Form -->
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            {{ form.username.label_tag }}
+                            {{ form.username|add_class:"form-control" }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.phone_namber.label_tag }}
+                            {{ form.phone_namber|add_class:"form-control" }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label_tag }}
+                            {{ form.password|add_class:"form-control" }}
+                        </div>
+
+                        <input type="hidden" name="next" value="{{ next }}">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">تسجيل دخول</button>
+                        </div>
+
+                    </form>
+
+                    <!-- Forgot password -->
+                    <div class="mt-3 text-center">
+                        <a href="{% url 'password_reset' %}">نسيت كلمة المرور؟</a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
