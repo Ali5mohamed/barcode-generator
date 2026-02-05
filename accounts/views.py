@@ -12,37 +12,6 @@ from io import BytesIO
 import base64
 #Create your views here.
 
-
-
-# def signup(request):
-#     if request.method == 'POST':
-#         user_form = SignupForm(request.POST)
-#         profile_form = ProfileForm(request.POST)
-
-#         if user_form.is_valid() and profile_form.is_valid():
-
-#             user =user_form.save()
-
-#             # profile اتعمل تلقائي عن طريق signal
-#             profile = user.profile
-#             profile.phone_namber = profile_form.cleaned_data.get('phone_namber')
-#             profile.addres = profile_form.cleaned_data.get('addres')
-#             profile.save()
-
-#             username = user_form.cleaned_data['username']
-#             password = user_form.cleaned_data['password1']
-#             user = authenticate(request , username=username, password=password)
-
-#             if user is not None:
-#                 login(request, user)
-#                 return redirect( 'accounts:dashboard')
-
-#     else:
-#         user_form = SignupForm()
-#         profile_form = ProfileForm()
-
-#     return render(request , 'registration/signup.html' , {'user_form':user_form , 'profile_form':profile_form})
-
 def signup(request):
     if request.method == 'POST':
         user_form = SignupForm(request.POST)
@@ -52,7 +21,7 @@ def signup(request):
 
             user = user_form.save()
 
-            # البروفايل اتعمل بالـ signal
+            #------------ البروفايل اتعمل بالـ signal
             profile = user.profile
             profile.phone_namber = profile_form.cleaned_data['phone_namber']
             profile.addres = profile_form.cleaned_data['addres']
@@ -69,7 +38,7 @@ def signup(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('accounts:dashboard')  # ✔️ صح
+                return redirect('accounts:dashboard')  
 
     else:
         user_form = SignupForm()
@@ -94,13 +63,13 @@ def dashboard(request):
         total_users = User.objects.count()
     
     
-    # لو سوبر يوزر، نجيب عدد الباركودات لكل مستخدم
+    # -----لو سوبر يوزر، نجيب عدد الباركودات لكل مستخدم
     users_with_barcodes = User.objects.annotate(
         barcode_count=Count('barcode')
     )
 
 
-    # مجموع كل المسحات
+    # -------مجموع كل المسحات
     total_scans = barcodes.aggregate(total=Sum('scans'))['total'] or 0
 
     return render(request, "registration/dashboard.html", {
@@ -112,15 +81,6 @@ def dashboard(request):
     })
 
 
-     
-
-# def login_view(request):
-#     pass
-
-
-
-# def logout_view(requwst):
-#     pass
 def logout_view(request):
     logout(request)
     return redirect('login')

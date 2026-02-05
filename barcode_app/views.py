@@ -10,12 +10,6 @@ from .forms import BarcodeForm
 import os
 import qrcode
 
-
-
-
-
-
-
 @login_required
 def create_barcode(request):
     if request.method == "POST":
