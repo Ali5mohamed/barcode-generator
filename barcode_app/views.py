@@ -73,11 +73,20 @@ def scan_barcode(request, barcode_id):
 
 def product_detail(request, barcode_id):
     barcode = get_object_or_404(Barcode, id=barcode_id)
-
+    if request.method == 'POST':
+        form = BarcodeForm(request.POST , request.FILES,instance=barcode)
+        if form.is_valid():
+            form.save()
+            return redirect('accounts:dashboard')
+    else:
+        form = BarcodeForm(instance=barcode)
     return render(
         request,
         "product_detail.html",
-        {"barcode": barcode}
+        {
+         "barcode": barcode,
+         "form":form,
+         }
     )
 
 
