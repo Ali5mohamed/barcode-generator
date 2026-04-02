@@ -67,7 +67,7 @@
           <div class="card shadow-sm border-0 bg-success text-white">
             <div class="card-body text-center">
               <h6>إنشاء باركود جديد</h6>
-              <p class="small">أنشئ باركودك خلال ثواني</p>
+              <p class="small">انشاء باركود للينك</p>
               <a
                 href="{% url 'barcode_app:create_barcode' %}"
                 class="btn btn-light btn-sm w-100"
@@ -83,9 +83,9 @@
           <div class="card shadow-sm border-0 bg-success text-white">
             <div class="card-body text-center">
               <h6>إنشاء باركود جديد</h6>
-              <p class="small">أنشئ باركودك خلال ثواني</p>
+              <p class="small"> انشاء باركود لقائمه طعام</p>
               <a
-                href="{% url 'barcode_app:create_barcode' %}"
+                href="{% url 'barcode_app:minu' %}"
                 class="btn btn-light btn-sm w-100"
               >
                 ➕ إنشاء الآن
@@ -124,16 +124,17 @@
 
                   <!-- المعاينة -->
                   <td>
-                    {% if barcode.type == 'link' %}
-                    <img
+                    {% comment %} {% if barcode.type == 'link' %} {% endcomment %}
+                    {%if barcode.qr_code%}
+                    {% comment %} <img
                       src="{{ barcode.qr_code.url }}"
                       class="img-thumbnail barcode-img"
                       width="80"
                       data-bs-toggle="modal"
                       data-bs-target="#previewModal"
                       onclick="showPreview('{{ barcode.qr_code.url }}')"
-                    />
-                    {% elif barcode.type == 'product' %}
+                    /> {% endcomment %}
+                    {% comment %} {% elif barcode.type == 'product' %} {% endcomment %}
                     <a href="{% url 'barcode_app:scan_barcode' barcode.id %}">
                       <img
                         src="{{ barcode.qr_code.url }}"

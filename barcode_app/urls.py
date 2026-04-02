@@ -23,4 +23,5 @@ urlpatterns = [
     path("delete/<int:barcode_id>/", views.delete_barcode, name="delete_barcode"),
     path("scan_barcode/<int:barcode_id>/", views.scan_barcode, name="scan_barcode"),
     path("product/<int:barcode_id>/", views.product_detail, name="product_detail"),
+    path ("'minu/" , views.minu , name="minu")
 ]

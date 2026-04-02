@@ -4,7 +4,7 @@ from .models import Barcode
 class BarcodeForm(forms.ModelForm):
     class Meta:
         model = Barcode
-        fields = ['type', 'title', 'description', 'url', 'product_image']
+        fields = ['title', 'description', 'url', 'product_image']
         widgets = {
             'type': forms.Select(attrs={'class':'form-select'}),
             'title': forms.TextInput(attrs={'class':'form-control'}),
