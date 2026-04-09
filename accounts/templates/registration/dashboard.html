@@ -114,11 +114,13 @@
                   <th>تاريخ الإنشاء</th>
                   <!-- <th>إجمالي المسحات</th>-->
                   <th>إجراءات</th>
+                  <th>معاينه المنيو</th>
                 </tr>
               </thead>
               <tbody>
                 {% for barcode in barcodes %}
                 <tr>
+                  
                   <td>{{ barcode.title }}</td>
                   <td>{{ barcode.get_type_display }}</td>
 
@@ -126,15 +128,7 @@
                   <td>
                     {% comment %} {% if barcode.type == 'link' %} {% endcomment %}
                     {%if barcode.qr_code%}
-                    {% comment %} <img
-                      src="{{ barcode.qr_code.url }}"
-                      class="img-thumbnail barcode-img"
-                      width="80"
-                      data-bs-toggle="modal"
-                      data-bs-target="#previewModal"
-                      onclick="showPreview('{{ barcode.qr_code.url }}')"
-                    /> {% endcomment %}
-                    {% comment %} {% elif barcode.type == 'product' %} {% endcomment %}
+                    
                     <a href="{% url 'barcode_app:scan_barcode' barcode.id %}">
                       <img
                         src="{{ barcode.qr_code.url }}"
@@ -145,17 +139,7 @@
                     {% endif %}
                   </td>
 
-                  <!-- تحميل -->
-                  {% comment %}
-                  <a href="{{ barcode.qr_code.url }}" target="_blank">
-                    <img
-                      src="{{ barcode.qr_code.url }}"
-                      class="img-thumbnail barcode-img"
-                      width="80"
-                    />
-                  </a>
-                  {% endcomment %} {% if barcode.qr_code %}
-
+                  
                   <td>
                     <a
                       href="{{ barcode.qr_code.url }}"
@@ -187,9 +171,19 @@
                       <button type="submit" class="btn btn-sm btn-outline-danger">
                         🗑️ حذف
                       </button>
+                     
                     </form>
                   </td>
+                  {%if barcode.type == 'menu'%}
+                      <td>
+                          <a href="{% url 'barcode_app:product_detail' barcode.id %}" class="btn btn-primary">
+                              عرض التفاصيل
+                          </a>
+                      </td>
+                  {%endif%}    
                 </tr>
+
+                
                 {% endfor %}
               </tbody>
             </table>

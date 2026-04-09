@@ -7,24 +7,57 @@
     <h3>إنشاء باركود جديد</h3>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      
+
+      <!-- حقل العنوان -->
       <div class="mb-3">
-          {{ form.title.label_tag }}      
-          {{ form.title }}
+        <label for="id_title">عنوان الباركود</label>
+        <input type="text" name="title" id="id_title" class="form-control" placeholder="أدخل عنوان الباركود" required>
       </div>
 
+      <!-- منتج رئيسي -->
+      <div class="mb-3">
+        {{ form.name.label_tag }}            
+        {{ form.name }}
+      </div>
+      <div class="mb-3">
+        {{ form.price.label_tag }}            
+        {{ form.price }}
+      </div>
       <div class="mb-3">
         {{ form.description.label_tag }}              
         {{ form.description }}
       </div>
-
       <div class="mb-3">
-       {{ form.product_image.label_tag }}            
-        {{ form.product_image }}
+        {{ form.image.label_tag }}            
+        {{ form.image }}
       </div>
-      
+
+      <!-- مكان إضافة المنتجات الديناميكية -->
+      <div id="items"></div>
+      <button type="button" onclick="addItem()" class="btn btn-secondary mb-3">Add Item</button>
+
+      <!-- زر الحفظ -->
       <button type="submit" class="btn btn-success w-100">إنشاء الباركود</button>
     </form>
   </div>
 </div>
+
+<script>
+function addItem(){
+  let html = `
+  <div class="card mb-3 p-3 item">
+    <div class="mb-2">
+      <input name="name[]" class="form-control" placeholder="اسم المنتج">
+    </div>
+    <div class="mb-2">
+      <input name="price[]" class="form-control" placeholder="السعر">
+    </div>
+    <div class="mb-2">
+      <input name="desc[]" class="form-control" placeholder="الوصف">
+    </div>
+  </div>
+  `;
+  document.getElementById("items").insertAdjacentHTML("beforeend", html);
+}
+</script>
 {% endblock %}

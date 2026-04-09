@@ -2,24 +2,31 @@
 {% block title %}{{ barcode.title }}{% endblock %}
 
 {% block content %}
-<form method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-{{form.as_p}}
-<button type='submit'  class="btn btn-success">حفظ التعديل</button>
-<a href="{% url 'accounts:dashboard'%}"  class="btn btn-secondary">الغاء</a>
-    <div class="container my-5">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h3 class="card-title">{{ barcode.title }}</h3>
-                {% if barcode.product_image %}
-                <img src="{{ barcode.product_image.url }}" class="img-fluid my-3" style="max-width:100px;">
+<div class="container mt-4 text-center">
+    <!-- عنوان المنيو كبير وفنص الصفحة -->
+    <h1 class="mb-4">{{ barcode.title }}</h1>
+
+    {% if products %}
+    <div class="row justify-content-center">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Image">
                 {% endif %}
-                <p class="card-text">{{ barcode.description }}</p>
-                {% comment %} عايز اضيف هنا السعر {% endcomment %}
-                <p class="card-text">السعر</p>
-                <p class="card-text">{{ barcode.created_at  }}</p>
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">السعر: {{ product.price }}</p>
+                    <p class="card-text">{{ product.description }}</p>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
-</form>
+    {% else %}
+        <p>لا توجد منتجات لهذا المنيو.</p>
+    {% endif %}
+</div>
 {% endblock %}

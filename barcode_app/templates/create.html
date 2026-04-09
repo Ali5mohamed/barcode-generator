@@ -7,6 +7,10 @@
     <h3>إنشاء باركود جديد</h3>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_title">عنوان الباركود</label>
+        <input type="text" name="title" id="id_title" class="form-control" placeholder="أدخل عنوان الباركود" required>
+      </div>
       
       <div class="mb-3">
           {{ form.title.label_tag }}      
