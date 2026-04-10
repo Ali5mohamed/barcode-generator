@@ -1,242 +1,263 @@
-{% extends "base_generic.html" %} {% block title %}Dashboard{% endblock %} 
+{% extends "base_generic.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
 
-      <!-- ترحيب -->
-      <div class="row mb-4">
-        <div class="col">
-          <h3>مرحبًا {{ request.user.username }} 👋</h3>
-          <p class="text-muted">دي لوحة التحكم الخاصة بيك</p>
-        </div>
+<!-- ترحيب -->
+
+<div class="row mb-4">
+  <div class="col">
+    <h3>مرحبًا {{ request.user.username }} 👋</h3>
+    <p class="text-muted">دي لوحة التحكم الخاصة بيك</p>
+  </div>
+</div>
+
+{% if messages and request.path == '/accounts/dashboard/' %}
+
+<ul>
+  {% for message in messages %}
+  <li>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<!--عدد المستخدمين-->
+
+{% if user.is_superuser %}
+
+<div class="row mb-4">
+  <div class="col">
+    <h3>{{ total_users }}</h3>
+    <p class="text-muted">عدد المستخدمين</p>
+  </div>
+</div>
+{% endif %}
+
+<!--عدد الباركودات لكل مستخدم-->
+
+{% if user.is_superuser %}
+
+<h3>عدد الباركودات لكل مستخدم:</h3>
+<ul>
+  {% for u in users_with_barcodes %}
+  <li>{{ u.username }} : {{ u.barcode_count }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<!-- كروت الإحصائيات -->
+
+<div class="row g-4">
+
+  <!-- عدد الباركودات -->
+
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center">
+        <h6 class="text-muted">عدد الباركودات</h6>
+        <h1 class="fw-bold">{{ all_barcode }}</h1>
       </div>
+    </div>
+  </div>
 
-      {% if messages and request.path == '/accounts/dashboard/' %}
-      <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
+  <!-- إنشاء باركود -->
 
-      <!--عدد المستخدمين-->
-      {% if user.is_superuser %}
-      <div class="row mb-4">
-        <div class="col">
-          <h3>{{ total_users }} 👋</h3>
-          <p class="text-muted">عدد المستخدمين</p>
-        </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 bg-success text-white">
+      <div class="card-body text-center">
+        <h6>إنشاء باركود جديد</h6>
+        <p class="small">انشاء باركود للينك</p>
+        <a
+          href="{% url 'barcode_app:create_barcode' %}"
+          class="btn btn-light btn-sm w-100"
+        >
+          ➕ إنشاء الآن
+        </a>
       </div>
+    </div>
+  </div>
 
-      {% endif %}
+  <!-- إنشاء باركود قائمة -->
 
-      <!--عدد الباركودات-->
-      {% if user.is_superuser %}
-      <h3>عدد الباركودات لكل مستخدم:</h3>
-      <ul>
-        {% for u in users_with_barcodes %}
-        <li>{{ u.username }} : {{ u.barcode_count }}</li>
-        {% endfor %}
-      </ul>
-
-      {% endif %}
-
-      <!-- كروت الإحصائيات -->
-      <div class="row g-4">
-        <!-- عدد الباركودات -->
-        <div class="col-md-4">
-          <div class="card shadow-sm border-0">
-            <div class="card-body text-center">
-              <h6 class="text-muted">عدد الباركودات</h6>
-              <h1 class="fw-bold">{{ all_barcode }}</h1>
-            </div>
-          </div>
-        </div>
-
-        <!-- إجمالي عدد المسحات -->
-        {% comment %} <div class="col-md-4">
-          <div class="card shadow-sm border-0 bg-info text-white">
-            <div class="card-body text-center">
-              <h6>إجمالي المسحات</h6>
-
-              <h1 class="fw-bold">{{ total_scans}}</h1>
-            </div>
-          </div>
-        </div> {% endcomment %}
-
-        <!-- إنشاء باركود -->
-        <div class="col-md-4">
-          <div class="card shadow-sm border-0 bg-success text-white">
-            <div class="card-body text-center">
-              <h6>إنشاء باركود جديد</h6>
-              <p class="small">انشاء باركود للينك</p>
-              <a
-                href="{% url 'barcode_app:create_barcode' %}"
-                class="btn btn-light btn-sm w-100"
-              >
-                ➕ إنشاء الآن
-              </a>
-            </div>
-          </div>
-        </div>
-        <!--هنا قايمه-->
-        <!-- إنشاء باركود -->
-        <div class="col-md-4">
-          <div class="card shadow-sm border-0 bg-success text-white">
-            <div class="card-body text-center">
-              <h6>إنشاء باركود جديد</h6>
-              <p class="small"> انشاء باركود لقائمه طعام</p>
-              <a
-                href="{% url 'barcode_app:minu' %}"
-                class="btn btn-light btn-sm w-100"
-              >
-                ➕ إنشاء الآن
-              </a>
-            </div>
-          </div>
-        </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0 bg-success text-white">
+      <div class="card-body text-center">
+        <h6>إنشاء باركود جديد</h6>
+        <p class="small">انشاء باركود لقائمة طعام</p>
+        <a
+          href="{% url 'barcode_app:minu' %}"
+          class="btn btn-light btn-sm w-100"
+        >
+          ➕ إنشاء الآن
+        </a>
       </div>
+    </div>
+  </div>
 
-      <hr class="my-5" />
+</div>
 
-      <!-- جدول الباركودات -->
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <h5 class="mb-3">باركوداتي</h5>
+<hr class="my-5" />
 
-          {% if barcodes %}
-          <div class="table-responsive">
-            <table class="table table-hover align-middle text-center">
-              <thead class="table-light">
-                <tr>
-                  <th>العنوان</th>
-                  <th>النوع</th>
-                  <th>المعاينة</th>
-                  <th>تحميل</th>
-                  <th>تاريخ الإنشاء</th>
-                  <!-- <th>إجمالي المسحات</th>-->
-                  <th>إجراءات</th>
-                  <th>معاينه المنيو</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for barcode in barcodes %}
-                <tr>
-                  
-                  <td>{{ barcode.title }}</td>
-                  <td>{{ barcode.get_type_display }}</td>
+<!-- جدول الباركودات -->
 
-                  <!-- المعاينة -->
-                  <td>
-                    {% comment %} {% if barcode.type == 'link' %} {% endcomment %}
-                    {%if barcode.qr_code%}
-                    
-                    <a href="{% url 'barcode_app:scan_barcode' barcode.id %}">
-                      <img
-                        src="{{ barcode.qr_code.url }}"
-                        class="img-thumbnail barcode-img"
-                        width="80"
-                      />
-                    </a>
-                    {% endif %}
-                  </td>
+<div class="card shadow-sm border-0">
+  <div class="card-body">
 
-                  
-                  <td>
-                    <a
-                      href="{{ barcode.qr_code.url }}"
-                      download
-                      class="btn btn-sm btn-outline-success"
-                    >
-                      تحميل
-                    </a>
-                  </td>
 
-                  <td>{{barcode.created_at}}</td>
+<h5 class="mb-3">باركوداتي</h5>
 
-                  {% else %}
-                  <td colspan="2" class="text-muted text-center">لا يوجد QR بعد</td>
-                  {% endif %}
+{% if barcodes %}
+<div class="table-responsive">
 
-                  <!-- إجمالي المسحات لكل باركود -->
-                  <!-- <td>{{ barcode.scans}}</td>
-                  <div class="card-body p-0"></div>
+  <table class="table table-hover align-middle text-center">
 
-                  <!-- حذف -->
-                  <td>
-                    <form
-                      method="post"
-                      action="{% url 'barcode_app:delete_barcode' barcode.id %}"
-                      onsubmit="return confirm('هل أنت متأكد من حذف هذا الباركود؟');"
-                    >
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
-                        🗑️ حذف
-                      </button>
-                     
-                    </form>
-                  </td>
-                  {%if barcode.type == 'menu'%}
-                      <td>
-                          <a href="{% url 'barcode_app:product_detail' barcode.id %}" class="btn btn-primary">
-                              عرض التفاصيل
-                          </a>
-                      </td>
-                  {%endif%}    
-                </tr>
+    <thead class="table-light">
+      <tr>
+        <th>العنوان</th>
+        <th>النوع</th>
+        <th>المعاينة</th>
+        <th>تحميل</th>
+        <th>تاريخ الإنشاء</th>
+        <th>إجراءات</th>
+        <th>معاينة المنيو</th>
+      </tr>
+    </thead>
 
-                
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <!-- Empty State -->
-          <div class="text-center py-5">
-            <h5 class="text-muted">لا يوجد باركودات حتى الآن</h5>
-            <p class="small text-muted">ابدأ بإنشاء أول باركود خاص بك</p>
-            <a href="{% url 'barcode_app:create_barcode' %}" class="btn btn-success">
-              إنشاء أول باركود
-            </a>
-          </div>
+    <tbody>
+
+      {% for barcode in barcodes %}
+      <tr>
+
+        <td>{{ barcode.title }}</td>
+
+        <td>{{ barcode.get_type_display }}</td>
+
+        <!-- المعاينة -->
+        <td>
+          {% if barcode.qr_code %}
+          <a href="{% url 'barcode_app:product_detail' barcode.id %}">
+            <img
+              src="{{ barcode.qr_code.url }}"
+              class="img-thumbnail barcode-img"
+              width="80"
+            />
+          </a>
           {% endif %}
-        </div>
-      </div>
+        </td>
 
-      <!-- Modal Preview -->
-      <div class="modal fade" id="previewModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">معاينة الباركود</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
+        <!-- تحميل -->
+        <td>
+          <a
+            href="{{ barcode.qr_code.url }}"
+            download
+            class="btn btn-sm btn-outline-success"
+          >
+            تحميل
+          </a>
+        </td>
 
-            <div class="modal-body text-center">
-              <img id="previewImage" src="" class="img-fluid rounded shadow" />
-            </div>
-          </div>
-        </div>
-      </div>
+        <td>{{ barcode.created_at }}</td>
 
-      <!-- JS -->
-      <script>
-        function showPreview(imageUrl) {
-          document.getElementById("previewImage").src = imageUrl;
-        }
-      </script>
+        <!-- حذف -->
+        <td>
+          <form
+            method="post"
+            action="{% url 'barcode_app:delete_barcode' barcode.id %}"
+            onsubmit="return confirm('هل أنت متأكد من حذف هذا الباركود؟');"
+          >
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+              🗑️ حذف
+            </button>
+          </form>
+        </td>
 
-      <!-- CSS -->
-      <style>
-        .barcode-img {
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-        .barcode-img:hover {
-          transform: scale(1.1);
-        }
-      </style>
+        <!-- معاينة المنيو -->
+        <td>
+          {% if barcode.type == 'menu' %}
+          <a href="{% url 'barcode_app:product_detail' barcode.id %}" class="btn btn-primary">
+            عرض التفاصيل
+          </a>
+          {% else %}
+          <span class="text-muted">---</span>
+          {% endif %}
+        </td>
+
+      </tr>
+
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-muted text-center">
+          لا يوجد QR بعد
+        </td>
+      </tr>
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+{% else %}
+
+<!-- Empty State -->
+<div class="text-center py-5">
+  <h5 class="text-muted">لا يوجد باركودات حتى الآن</h5>
+  <p class="small text-muted">ابدأ بإنشاء أول باركود خاص بك</p>
+  <a href="{% url 'barcode_app:create_barcode' %}" class="btn btn-success">
+    إنشاء أول باركود
+  </a>
+</div>
+
+{% endif %}
+
+
+  </div>
+</div>
+
+<!-- Modal Preview -->
+
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+
+  <div class="modal-header">
+    <h5 class="modal-title">معاينة الباركود</h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="modal"
+    ></button>
+  </div>
+
+  <div class="modal-body text-center">
+    <img id="previewImage" src="" class="img-fluid rounded shadow" />
+  </div>
+
+</div>
+
+
+  </div>
+</div>
+
+<script>
+function showPreview(imageUrl) {
+  document.getElementById("previewImage").src = imageUrl;
+}
+</script>
+
+<style>
+.barcode-img {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.barcode-img:hover {
+  transform: scale(1.1);
+}
+</style>
 
 {% endblock %}

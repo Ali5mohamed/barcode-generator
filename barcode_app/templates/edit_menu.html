@@ -1,0 +1,74 @@
+{% extends "base_generic.html" %}
+{% block title %}تعديل المنيو{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">تعديل المنيو</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- عنوان المنيو -->
+        <div class="mb-3">
+            <label>عنوان المنيو</label>
+            <input type="text" name="title" class="form-control" value="{{ barcode.title }}" required>
+        </div>
+
+        <div id="items">
+
+            {% for product in products %}
+            <div class="card mb-3 p-3 item">
+
+                <input type="hidden" name="product_id[]" value="{{ product.id }}">
+
+                <input name="name[]" class="form-control mb-2" value="{{ product.name }}">
+                <input name="price[]" class="form-control mb-2" value="{{ product.price }}">
+                <input name="desc[]" class="form-control mb-2" value="{{ product.description }}">
+
+                <!-- عرض الصورة الحالية -->
+                <div class="mb-2 text-center">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" width="120" class="rounded mb-2">
+                    {% else %}
+                        <p>لا توجد صورة</p>
+                    {% endif %}
+                </div>
+
+                <!-- اختيار صورة جديدة -->
+                <input type="file" name="image[]" class="form-control">
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <button type="button" onclick="addItem()" class="btn btn-secondary mb-3">
+            إضافة منتج جديد
+        </button>
+
+        <button type="submit" class="btn btn-success w-100">
+            حفظ التعديلات
+        </button>
+    </form>
+</div>
+
+<script>
+function addItem(){
+  let html = `
+  <div class="card mb-3 p-3 item">
+
+    <input name="name[]" class="form-control mb-2" placeholder="اسم المنتج">
+    <input name="price[]" class="form-control mb-2" placeholder="السعر">
+    <input name="desc[]" class="form-control mb-2" placeholder="الوصف">
+
+    <!-- صورة جديدة -->
+    <input type="file" name="image[]" class="form-control">
+
+  </div>
+  `;
+
+  document.getElementById("items").insertAdjacentHTML("beforeend", html);
+}
+</script>
+
+{% endblock %}

@@ -63,15 +63,28 @@ def minu(request):
         names = request.POST.getlist("name[]")
         prices = request.POST.getlist("price[]")
         descs = request.POST.getlist("desc[]")
+        images = request.FILES.getlist("image[]")
 
-        for name, price, desc in zip(names, prices, descs):
-            if name.strip():  # نتأكد أن الاسم مش فاضي
+        for i in range(len(names)):
+
+            name = names[i]
+            price = prices[i]
+            desc = descs[i]
+
+            image = None
+            if i < len(images):
+                image = images[i]
+
+            if name.strip():
                 Product.objects.create(
                     barcode=barcode,
                     name=name,
                     price=price,
-                    description=desc
+                    description=desc,
+                    image=image
                 )
+
+                     
 
         # حفظ منتج رئيسي من الفورم
         form = ProductForm(request.POST, request.FILES)
@@ -111,17 +124,6 @@ def delete_barcode(request, barcode_id):
         return redirect("accounts:dashboard")
 
 
-def scan_barcode(request, barcode_id):
-    barcode = get_object_or_404(Barcode, id=barcode_id)
-
-    #-------------زيادة عدد المسحات
-    Barcode.objects.filter(id=barcode_id).update(scans=F("scans") + 1)
-
-    if barcode.type == "link":
-        return redirect(barcode.url)
-
-    return redirect("barcode_app:product_detail", barcode_id=barcode.id)
-
 
 
 def product_detail(request, barcode_id):
@@ -132,6 +134,64 @@ def product_detail(request, barcode_id):
     products = Product.objects.filter(barcode=barcode)
 
     return render(request, "product_detail.html", {
+        "barcode": barcode,
+        "products": products
+    })
+
+def edit_menu(request, barcode_id):
+    barcode = get_object_or_404(Barcode, id=barcode_id, user=request.user)
+    products = barcode.products.all()
+
+    if request.method == "POST":
+        barcode.title = request.POST.get("title", barcode.title)
+        barcode.save()
+
+        product_ids = request.POST.getlist("product_id[]")
+        names = request.POST.getlist("name[]")
+        prices = request.POST.getlist("price[]")
+        descs = request.POST.getlist("desc[]")
+        images = request.FILES.getlist("image[]")
+
+        for i in range(len(names)):
+
+            name = names[i]
+            price = prices[i]
+            desc = descs[i]
+
+            if i < len(product_ids) and product_ids[i]:
+                # ===== تعديل منتج موجود =====
+                product = Product.objects.get(id=product_ids[i], barcode=barcode)
+
+                product.name = name
+                product.price = price
+                product.description = desc
+
+                # 🟢 الصورة: لو المستخدم رفع جديدة غيرها
+                if i < len(images) and images[i]:
+                    product.image = images[i]
+                # else: نسيب القديمة زي ما هي
+
+                product.save()
+
+            else:
+                # ===== إضافة منتج جديد =====
+                image = None
+                if i < len(images) and images[i]:
+                    image = images[i]
+
+                if name.strip():
+                    Product.objects.create(
+                        barcode=barcode,
+                        name=name,
+                        price=price,
+                        description=desc,
+                        image=image
+                    )
+
+        messages.success(request, "تم تعديل المنيو بنجاح ✅")
+        return redirect("barcode_app:product_detail", barcode.id)
+
+    return render(request, "edit_menu.html", {
         "barcode": barcode,
         "products": products
     })

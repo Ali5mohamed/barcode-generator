@@ -20,11 +20,17 @@
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text">السعر: {{ product.price }}</p>
                     <p class="card-text">{{ product.description }}</p>
+                    
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'barcode_app:edit_menu' barcode.id %}" class="btn btn-primary mb-3">
+           تعديل المنيو
+        </a>
+    {% endif %}
     {% else %}
         <p>لا توجد منتجات لهذا المنيو.</p>
     {% endif %}
