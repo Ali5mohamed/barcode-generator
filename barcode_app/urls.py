@@ -23,5 +23,7 @@ urlpatterns = [
     path("delete/<int:barcode_id>/", views.delete_barcode, name="delete_barcode"),
     path("edit_menu/<int:barcode_id>/", views.edit_menu, name="edit_menu"),
     path("product/<int:barcode_id>/", views.product_detail, name="product_detail"),
-    path ("'minu/" , views.minu , name="minu")
+    path("delete/product/<int:pk>/", views.delete_product, name="delete_product"),
+    path("edit/product/<int:pk>/", views.edit_product, name="edit_product"),
+    path ("minu/" , views.minu , name="minu")
 ]

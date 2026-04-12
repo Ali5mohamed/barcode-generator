@@ -3,36 +3,78 @@
 
 {% block content %}
 <div class="container mt-4 text-center">
-    <!-- عنوان المنيو كبير وفنص الصفحة -->
+
+    <!-- عنوان المنيو -->
     <h1 class="mb-4">{{ barcode.title }}</h1>
 
     {% if products %}
     <div class="row justify-content-center">
+
         {% for product in products %}
         <div class="col-md-3 mb-4">
+
             <div class="card h-100 shadow-sm">
+
                 {% if product.image %}
                 <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                 {% else %}
                 <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="No Image">
                 {% endif %}
+
                 <div class="card-body text-center">
+
                     <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text">السعر: {{ product.price }}</p>
-                    <p class="card-text">{{ product.description }}</p>
-                    
+
+                    <p class="card-text">
+                        <strong>السعر:</strong> {{ product.price }}
+                    </p>
+
+                    <p class="card-text text-muted">
+                        {{ product.description }}
+                    </p>
+
+                    {% if user.is_authenticated %}
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+
+                        <!-- تعديل -->
+                        <a href="{% url 'barcode_app:edit_product' product.id %}" 
+                           class="btn btn-sm btn-warning">
+                           تعديل
+                        </a>
+
+                        <!-- حذف -->
+                        <form method="POST" action="{% url 'barcode_app:delete_product' product.id %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('هل أنت متأكد من حذف المنتج؟')">
+                                حذف
+                            </button>
+                        </form>
+
+                    </div>
+                    {% endif %}
+
                 </div>
+
             </div>
+
         </div>
         {% endfor %}
+
     </div>
+
+    <!-- تعديل المنيو -->
     {% if user.is_authenticated %}
-        <a href="{% url 'barcode_app:edit_menu' barcode.id %}" class="btn btn-primary mb-3">
-           تعديل المنيو
-        </a>
+    <a href="{% url 'barcode_app:edit_menu' barcode.id %}" 
+       class="btn btn-primary mb-3">
+       تعديل المنيو
+    </a>
     {% endif %}
+
     {% else %}
         <p>لا توجد منتجات لهذا المنيو.</p>
     {% endif %}
+
 </div>
 {% endblock %}

@@ -115,6 +115,7 @@ def minu(request):
 
     return render(request, "minu.html", {"form": form})
 @login_required
+#-------داله حزف المنيو كله 
 def delete_barcode(request, barcode_id):
     barcode = get_object_or_404(Barcode, id=barcode_id, user=request.user)
 
@@ -194,4 +195,33 @@ def edit_menu(request, barcode_id):
     return render(request, "edit_menu.html", {
         "barcode": barcode,
         "products": products
+    })
+
+
+def delete_product(request, pk):
+    product = get_object_or_404(Product, id=pk)
+    barcode_id = product.barcode.id
+
+    if request.method == "POST":
+        product.delete()
+
+    return redirect("barcode_app:product_detail", barcode_id=barcode_id)
+
+def edit_product(request, pk):
+    product = get_object_or_404(Product, id=pk)
+
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect(
+                "barcode_app:product_detail",
+                barcode_id=product.barcode.id
+            )
+    else:
+        form = ProductForm(instance=product)
+
+    return render(request, "edit_product.html", {
+        "form": form,
+        "product": product
     })
