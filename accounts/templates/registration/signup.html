@@ -1,47 +1,78 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-7 col-lg-6">
 
-            <!-- Signup Card -->
-            <div class="card shadow-sm">
-                <div class="card-body">
+            <div class="card border-0 shadow-lg rounded-4">
+                <div class="card-body p-4 p-md-5">
 
-                    <h3 class="card-title mb-4 text-center">إنشاء حساب جديد</h3>
+                    <h3 class="text-center mb-4 fw-bold">
+                        إنشاء حساب جديد
+                    </h3>
 
-                    <!-- Errors -->
                     {% if user_form.errors or profile_form.errors %}
-                        <div class="alert alert-danger">
-                            الرجاء تصحيح الأخطاء الموجودة في النموذج.
+                        <div class="alert alert-danger text-center">
+                            الرجاء تصحيح الأخطاء الموجودة في النموذج
                         </div>
                     {% endif %}
 
-                    <!-- Signup Form -->
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- User Form Fields -->
-                        <h5>معلومات المستخدم</h5>
-                        <div class="mb-3">
-                            {{ user_form.as_p }}
+                        <!-- User Info -->
+                        <div class="mb-4">
+                            <h5 class="mb-3 text-primary">معلومات المستخدم</h5>
+
+                            <div class="mb-3">
+                                <label class="form-label">اسم المستخدم</label>
+                                {{ user_form.username }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">البريد الإلكتروني</label>
+                                {{ user_form.email }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">كلمة المرور</label>
+                                {{ user_form.password1 }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">تأكيد كلمة المرور</label>
+                                {{ user_form.password2 }}
+                            </div>
                         </div>
 
-                        <!-- Profile Form Fields -->
-                        <h5>معلومات إضافية</h5>
-                        <div class="mb-3">
-                            {{ profile_form.as_p }}
+                        <hr>
+
+                        <!-- Profile Info -->
+                        <div class="mb-4">
+                            <h5 class="mb-3 text-success">معلومات إضافية</h5>
+
+                            <div class="mb-3">
+                                <label class="form-label"> العنوان</label>
+                                {{ profile_form.addres }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">رقم الهاتف</label>
+                                {{ profile_form.phone_namber }}
+                            </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 rounded-3">
+                            إنشاء الحساب
+                        </button>
                     </form>
 
-                    <div class="mt-3 text-center">
-                        لديك حساب بالفعل؟ 
-                        <a href="{% url 'login' %}">تسجيل دخول</a>
+                    <div class="text-center mt-4">
+                        لديك حساب بالفعل؟
+                        <a href="{% url 'login' %}" class="text-decoration-none">
+                            تسجيل الدخول
+                        </a>
                     </div>
 
                 </div>
@@ -51,5 +82,3 @@
     </div>
 </div>
 {% endblock %}
-
-
