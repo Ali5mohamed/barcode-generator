@@ -8,7 +8,7 @@ from .models import Barcode
 from .forms import BarcodeForm
 from .forms import LinkForm , ProductForm
 from .models import Barcode
-from .models import Product , Link 
+from .models import Product , Link , Category
 import os
 import qrcode
 
@@ -46,74 +46,87 @@ def create_barcode(request):
     return render(request, "create.html", {"form": form})
 def minu(request):
     if request.method == "POST":
-        # حفظ بيانات الباركود أولاً
+
         title = request.POST.get("title", "").strip()
-        barcode_type = "menu"  # بما أن هذه الصفحة للـ menu فقط
+
         if not title:
             messages.error(request, "الرجاء إدخال عنوان الباركود")
             return redirect(request.path)
 
+        # إنشاء الباركود
         barcode = Barcode.objects.create(
             user=request.user,
             title=title,
-            type=barcode_type
+            type="menu"
         )
 
-        # حفظ المنتجات الديناميكية
+        # =========================
+        # بيانات الديناميكية
+        # =========================
         names = request.POST.getlist("name[]")
         prices = request.POST.getlist("price[]")
         descs = request.POST.getlist("desc[]")
+        categories = request.POST.getlist("category[]")
         images = request.FILES.getlist("image[]")
 
         for i in range(len(names)):
 
-            name = names[i]
+            name = names[i].strip()
             price = prices[i]
             desc = descs[i]
+            category_name = categories[i] if i < len(categories) else None
 
-            image = None
-            if i < len(images):
-                image = images[i]
+            image = images[i] if i < len(images) else None
 
-            if name.strip():
-                Product.objects.create(
+            if not name:
+                continue
+
+            # =========================
+            # إنشاء أو جلب القسم
+            # =========================
+            category_obj = None
+            if category_name:
+                category_obj, _ = Category.objects.get_or_create(
                     barcode=barcode,
-                    name=name,
-                    price=price,
-                    description=desc,
-                    image=image
+                    name=category_name.strip()
                 )
 
-                     
+            # =========================
+            # إنشاء المنتج
+            # =========================
+            Product.objects.create(
+                barcode=barcode,
+                category=category_obj,
+                name=name,
+                price=price,
+                description=desc,
+                image=image
+            )
 
-        # حفظ منتج رئيسي من الفورم
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            product = form.save(commit=False)
-            product.barcode = barcode
-            product.save()
-        else:
-            messages.warning(request, "تم حفظ الباركود والمنتجات الديناميكية، لكن حدث خطأ في المنتج الرئيسي")
+        # =========================
+        # إنشاء QR
+        # =========================
+        qr_data = request.build_absolute_uri(
+            f"/barcode_app/product/{barcode.id}/"
+        )
 
-        # ---------------- إنشاء QR لكل الباركود
-        qr_data = request.build_absolute_uri(f"/barcode_app/scan_barcode/{barcode.id}/")
         img = qrcode.make(qr_data)
 
         barcode_dir = os.path.join(settings.MEDIA_ROOT, "barcodes")
         os.makedirs(barcode_dir, exist_ok=True)
+
         file_name = f"barcode_{barcode.id}.png"
         file_path = os.path.join(barcode_dir, file_name)
+
         img.save(file_path)
 
         barcode.qr_code.name = f"barcodes/{file_name}"
         barcode.save(update_fields=["qr_code"])
 
-        messages.success(request, "تم إنشاء الباركود والمنتجات بنجاح ✅")
+        messages.success(request, "تم إنشاء المنيو بنجاح ✅")
         return redirect("accounts:dashboard")
-    else:
-        form = ProductForm()
 
-    return render(request, "minu.html", {"form": form})
+    return render(request, "minu.html")
 @login_required
 #-------داله حزف المنيو كله 
 def delete_barcode(request, barcode_id):
@@ -128,22 +141,27 @@ def delete_barcode(request, barcode_id):
 
 
 def product_detail(request, barcode_id):
-   # نجيب الباركود أو 404 لو مش موجود
     barcode = get_object_or_404(Barcode, id=barcode_id)
-    
-    # نجيب كل المنتجات المرتبطة بالباركود
-    products = Product.objects.filter(barcode=barcode)
+
+    # المنتجات مباشرة من الباركود
+    products = barcode.products.select_related("category")
+
+    # الأقسام
+    categories = Category.objects.filter(barcode=barcode)
 
     return render(request, "product_detail.html", {
         "barcode": barcode,
-        "products": products
+        "products": products,
+        "categories": categories,
     })
 
 def edit_menu(request, barcode_id):
     barcode = get_object_or_404(Barcode, id=barcode_id, user=request.user)
-    products = barcode.products.all()
+    products = Product.objects.filter(barcode=barcode)
+    categories = Category.objects.filter(barcode=barcode)
 
     if request.method == "POST":
+        # تعديل عنوان الباركود
         barcode.title = request.POST.get("title", barcode.title)
         barcode.save()
 
@@ -151,42 +169,52 @@ def edit_menu(request, barcode_id):
         names = request.POST.getlist("name[]")
         prices = request.POST.getlist("price[]")
         descs = request.POST.getlist("desc[]")
+        categories_data = request.POST.getlist("category[]")
         images = request.FILES.getlist("image[]")
 
         for i in range(len(names)):
 
-            name = names[i]
+            name = names[i].strip()
             price = prices[i]
             desc = descs[i]
+            category_name = categories_data[i] if i < len(categories_data) else None
 
+            # 🟢 إنشاء أو جلب القسم
+            category_obj = None
+            if category_name:
+                category_obj, _ = Category.objects.get_or_create(
+                    name=category_name,
+                    barcode=barcode
+                )
+
+            # =========================
+            # تعديل منتج موجود
+            # =========================
             if i < len(product_ids) and product_ids[i]:
-                # ===== تعديل منتج موجود =====
                 product = Product.objects.get(id=product_ids[i], barcode=barcode)
 
                 product.name = name
                 product.price = price
                 product.description = desc
+                product.category = category_obj
 
-                # 🟢 الصورة: لو المستخدم رفع جديدة غيرها
                 if i < len(images) and images[i]:
                     product.image = images[i]
-                # else: نسيب القديمة زي ما هي
 
                 product.save()
 
+            # =========================
+            # إضافة منتج جديد
+            # =========================
             else:
-                # ===== إضافة منتج جديد =====
-                image = None
-                if i < len(images) and images[i]:
-                    image = images[i]
-
-                if name.strip():
+                if name:
                     Product.objects.create(
                         barcode=barcode,
+                        category=category_obj,
                         name=name,
                         price=price,
                         description=desc,
-                        image=image
+                        image=images[i] if i < len(images) else None
                     )
 
         messages.success(request, "تم تعديل المنيو بنجاح ✅")
@@ -194,9 +222,9 @@ def edit_menu(request, barcode_id):
 
     return render(request, "edit_menu.html", {
         "barcode": barcode,
-        "products": products
+        "products": products,
+        "categories": categories
     })
-
 
 def delete_product(request, pk):
     product = get_object_or_404(Product, id=pk)
@@ -210,14 +238,23 @@ def delete_product(request, pk):
 def edit_product(request, pk):
     product = get_object_or_404(Product, id=pk)
 
+    barcode_id = product.barcode.id if product.barcode else None
+
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES, instance=product)
+
         if form.is_valid():
-            form.save()
-            return redirect(
-                "barcode_app:product_detail",
-                barcode_id=product.barcode.id
-            )
+            product = form.save(commit=False)
+
+            # مهم جدًا: تأكد من حفظ العلاقة
+            product.save()
+
+            form.save_m2m()  # لو category ManyToMany
+
+            if barcode_id:
+                return redirect("barcode_app:product_detail", barcode_id=barcode_id)
+            return redirect("barcode_app:home")
+
     else:
         form = ProductForm(instance=product)
 

@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="container mt-4">
+
     <h1 class="text-center mb-4">تعديل المنيو</h1>
 
     <form method="post" enctype="multipart/form-data">
@@ -19,23 +20,33 @@
             {% for product in products %}
             <div class="card mb-3 p-3 item">
 
+                <!-- ID -->
                 <input type="hidden" name="product_id[]" value="{{ product.id }}">
 
+                <!-- الاسم -->
                 <input name="name[]" class="form-control mb-2" value="{{ product.name }}">
-                <input name="price[]" class="form-control mb-2" value="{{ product.price }}">
-                <input name="desc[]" class="form-control mb-2" value="{{ product.description }}">
-                <input name="image[]" class="form-control mb-2" value="{{ product.image }}">
 
-                <!-- عرض الصورة الحالية -->
-                <div class="mb-2 text-center">
+                <!-- السعر -->
+                <input name="price[]" class="form-control mb-2" value="{{ product.price }}">
+
+                <!-- الوصف -->
+                <input name="desc[]" class="form-control mb-2" value="{{ product.description }}">
+
+                <!-- القسم -->
+                <input name="category[]" class="form-control mb-2"
+                       value="{{ product.category.name|default:'' }}"
+                       placeholder="القسم">
+
+                <!-- الصورة الحالية -->
+                <div class="text-center mb-2">
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" width="120" class="rounded mb-2">
+                        <img src="{{ product.image.url }}" width="120" class="rounded">
                     {% else %}
                         <p>لا توجد صورة</p>
                     {% endif %}
                 </div>
 
-                <!-- اختيار صورة جديدة -->
+                <!-- رفع صورة جديدة -->
                 <input type="file" name="image[]" class="form-control">
 
             </div>
@@ -44,25 +55,33 @@
         </div>
 
         <button type="button" onclick="addItem()" class="btn btn-secondary mb-3">
-            إضافة منتج جديد
+            + إضافة منتج جديد
         </button>
 
         <button type="submit" class="btn btn-success w-100">
             حفظ التعديلات
         </button>
+
     </form>
 </div>
 
 <script>
+
 function addItem(){
+
   let html = `
   <div class="card mb-3 p-3 item">
+
+    <input type="hidden" name="product_id[]" value="">
 
     <input name="name[]" class="form-control mb-2" placeholder="اسم المنتج">
     <input name="price[]" class="form-control mb-2" placeholder="السعر">
     <input name="desc[]" class="form-control mb-2" placeholder="الوصف">
 
-    <!-- صورة جديدة -->
+    <!-- قسم -->
+    <input name="category[]" class="form-control mb-2" placeholder="القسم">
+
+    <!-- صورة -->
     <input type="file" name="image[]" class="form-control">
 
   </div>
@@ -70,6 +89,7 @@ function addItem(){
 
   document.getElementById("items").insertAdjacentHTML("beforeend", html);
 }
+
 </script>
 
 {% endblock %}

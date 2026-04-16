@@ -80,7 +80,12 @@ class Link(models.Model):
     def __str__(self):
         return self.url
 
+class Category(models.Model):
+    barcode = models.ForeignKey("Barcode", on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 # موديل المنتجات
 class Product(models.Model):
 
@@ -89,7 +94,7 @@ class Product(models.Model):
         on_delete=models.CASCADE,
         related_name="products"
     )
-
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=200)
 
     price = models.CharField(max_length=50)
