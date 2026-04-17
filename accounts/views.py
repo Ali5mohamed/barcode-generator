@@ -3,6 +3,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from barcode_app.models import Barcode
 from .forms import SignupForm , ProfileForm
+from .models import Profile
 from django.contrib.auth import authenticate , login ,logout
 from django.db.models import Sum
 from django.contrib.auth.models import User  # علشان نجيب عدد المستخدمين
@@ -21,11 +22,11 @@ def signup(request):
 
             user = user_form.save()
 
-            #------------ البروفايل اتعمل بالـ signal
-            profile = user.profile
-            profile.phone_namber = profile_form.cleaned_data['phone_namber']
-            profile.addres = profile_form.cleaned_data['addres']
-            profile.save()
+            profile = Profile.objects.create(
+                user=user,
+                phone_namber=profile_form.cleaned_data['phone_namber'],
+                addres=profile_form.cleaned_data['addres']
+            )
 
             username = user_form.cleaned_data['username']
             password = user_form.cleaned_data['password1']
@@ -38,21 +39,16 @@ def signup(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('accounts:dashboard')  
+                return redirect('accounts:dashboard')
 
     else:
         user_form = SignupForm()
         profile_form = ProfileForm()
 
-    return render(
-        request,
-        'registration/signup.html',
-        {
-            'user_form': user_form,
-            'profile_form': profile_form
-        }
-    )
-
+    return render(request, 'registration/signup.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
 @never_cache
 @login_required
 def dashboard(request):
