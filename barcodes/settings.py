@@ -109,8 +109,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
@@ -122,7 +122,20 @@ USE_I18N = True
 
 USE_TZ = True
 
+INSTALLED_APPS += [
+    'cloudinary',
+    'cloudinary_storage',
+]
 
+
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dkdopbckq',
+    'API_KEY': '793272631147827',
+    'API_SECRET': '5QQE2',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
