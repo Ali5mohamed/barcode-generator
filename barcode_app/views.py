@@ -44,6 +44,9 @@ def create_barcode(request):
         form = LinkForm()
 
     return render(request, "create.html", {"form": form})
+
+
+@login_required
 def minu(request):
     if request.method == "POST":
 
