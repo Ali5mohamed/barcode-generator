@@ -11,8 +11,8 @@ from .models import Barcode
 from .models import Product , Link , Category
 import os
 import qrcode
-
-
+from django.core.files.base import ContentFile
+import io
 @login_required
 def create_barcode(request):
     if request.method == "POST":
@@ -56,7 +56,9 @@ def minu(request):
             messages.error(request, "الرجاء إدخال عنوان الباركود")
             return redirect(request.path)
 
+        # =========================
         # إنشاء الباركود
+        # =========================
         barcode = Barcode.objects.create(
             user=request.user,
             title=title,
@@ -64,7 +66,7 @@ def minu(request):
         )
 
         # =========================
-        # بيانات الديناميكية
+        # البيانات الديناميكية
         # =========================
         names = request.POST.getlist("name[]")
         prices = request.POST.getlist("price[]")
@@ -78,7 +80,6 @@ def minu(request):
             price = prices[i]
             desc = descs[i]
             category_name = categories[i] if i < len(categories) else None
-
             image = images[i] if i < len(images) else None
 
             if not name:
@@ -107,7 +108,7 @@ def minu(request):
             )
 
         # =========================
-        # إنشاء QR
+        # إنشاء QR ورفعه على Cloudinary
         # =========================
         qr_data = request.build_absolute_uri(
             f"/barcode_app/product/{barcode.id}/"
@@ -115,16 +116,16 @@ def minu(request):
 
         img = qrcode.make(qr_data)
 
-        barcode_dir = os.path.join(settings.MEDIA_ROOT, "barcodes")
-        os.makedirs(barcode_dir, exist_ok=True)
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
 
         file_name = f"barcode_{barcode.id}.png"
-        file_path = os.path.join(barcode_dir, file_name)
 
-        img.save(file_path)
-
-        barcode.qr_code.name = f"barcodes/{file_name}"
-        barcode.save(update_fields=["qr_code"])
+        barcode.qr_code.save(
+            file_name,
+            ContentFile(buffer.getvalue()),
+            save=True
+        )
 
         messages.success(request, "تم إنشاء المنيو بنجاح ✅")
         return redirect("accounts:dashboard")
