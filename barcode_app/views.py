@@ -80,7 +80,7 @@ def minu(request):
         # =========================
         names = request.POST.getlist("name[]")
         prices = request.POST.getlist("price[]")
-        descs = request.POST.getlist("desc[]")
+        descs = request.POST.getlist("description[]")
         categories = request.POST.getlist("category[]")
         images = request.FILES.getlist("image[]")
 
