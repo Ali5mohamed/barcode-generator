@@ -36,8 +36,11 @@
                                 <strong>السعر:</strong> {{ product.price }}
                             </p>
 
-                            <p class="card-text text-muted small">
+                            {% comment %} <p class="card-text text-muted small">
                                 {{ product.description }}
+                            </p> {% endcomment %}
+                            <p class="card-text text-muted small">
+                                {{ product.description|truncatechars:100 }}
                             </p>
 
                             {% if user.is_authenticated %}
