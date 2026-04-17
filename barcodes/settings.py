@@ -132,7 +132,7 @@ INSTALLED_APPS += [
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dkdopbckq',
     'API_KEY': '793272631147827',
-    'API_SECRET': '5QQE2',
+    'API_SECRET': '2j8hIa-s3kFNSAOrsUruSchcMLg',
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -146,3 +146,19 @@ STATIC_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR , 'staticfiles')
+INSTALLED_APPS += [
+    'cloudinary',
+    'cloudinary_storage',
+]
+
+
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    }
+}
