@@ -22,24 +22,14 @@ def signup(request):
 
             user = user_form.save()
 
-            profile = Profile.objects.create(
+            Profile.objects.create(
                 user=user,
                 phone_namber=profile_form.cleaned_data['phone_namber'],
                 addres=profile_form.cleaned_data['addres']
             )
 
-            username = user_form.cleaned_data['username']
-            password = user_form.cleaned_data['password1']
-
-            user = authenticate(
-                request,
-                username=username,
-                password=password
-            )
-
-            if user is not None:
-                login(request, user)
-                return redirect('accounts:dashboard')
+            login(request, user)
+            return redirect('accounts:dashboard')
 
     else:
         user_form = SignupForm()
