@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'barcode_app',
     'widget_tweaks',
 
+    'cloudinary',
+    'cloudinary_storage',
+
 ]
 
 MIDDLEWARE = [
@@ -122,10 +125,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-INSTALLED_APPS += [
-    'cloudinary',
-    'cloudinary_storage',
-]
+
 
 
 
@@ -146,10 +146,7 @@ STATIC_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR , 'staticfiles')
-INSTALLED_APPS += [
-    'cloudinary',
-    'cloudinary_storage',
-]
+
 
 
 
