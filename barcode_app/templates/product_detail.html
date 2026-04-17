@@ -2,28 +2,30 @@
 {% block title %}{{ barcode.title }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4 text-center">
+<div class="container mt-4">
 
-    <h1 class="mb-4">{{ barcode.title }}</h1>
+    <h1 class="mb-4 text-center">{{ barcode.title }}</h1>
 
     {% if categories %}
 
         {% for category in categories %}
 
             <!-- القسم -->
-            <h3 class="text-start mt-4 mb-3"> قسم {{ category.name }}</h3>
+            <h3 class="mt-4 mb-3 text-primary">
+                قسم {{ category.name }}
+            </h3>
 
-            <div class="row justify-content-start">
+            <div class="row">
 
                 {% for product in category.product_set.all %}
-                <div class="col-md-3 mb-4">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
 
                     <div class="card h-100 shadow-sm">
 
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" class="card-img-top">
+                        <img src="{{ product.image.url }}" class="card-img-top img-fluid">
                         {% else %}
-                        <img src="https://via.placeholder.com/300x200?text=No+Image">
+                        <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top img-fluid">
                         {% endif %}
 
                         <div class="card-body text-center">
@@ -34,20 +36,22 @@
                                 <strong>السعر:</strong> {{ product.price }}
                             </p>
 
-                            <p class="card-text text-muted">
+                            <p class="card-text text-muted small">
                                 {{ product.description }}
                             </p>
 
                             {% if user.is_authenticated %}
-                            <div class="d-flex justify-content-center gap-2 mt-3">
+                            <div class="d-flex flex-column gap-2 mt-3">
 
-                                <a href="{% url 'barcode_app:edit_product' product.id %}" class="btn btn-warning btn-sm">
+                                <a href="{% url 'barcode_app:edit_product' product.id %}"
+                                   class="btn btn-warning btn-sm w-100">
                                     تعديل
                                 </a>
 
-                                <form method="POST" action="{% url 'barcode_app:delete_product' product.id %}">
+                                <form method="POST"
+                                      action="{% url 'barcode_app:delete_product' product.id %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-danger btn-sm">
+                                    <button class="btn btn-danger btn-sm w-100">
                                         حذف
                                     </button>
                                 </form>
@@ -60,28 +64,25 @@
                     </div>
 
                 </div>
-                
                 {% empty %}
                     <p class="text-muted">لا توجد منتجات في هذا القسم</p>
                 {% endfor %}
 
-
             </div>
-            
-
 
         {% endfor %}
-        
-        <!-- تعديل المنيو -->
+
         {% if user.is_authenticated %}
-            <a href="{% url 'barcode_app:edit_menu' barcode.id %}" 
-            class="btn btn-primary mb-3">
-            تعديل المنيو
+        <div class="text-center mt-4">
+            <a href="{% url 'barcode_app:edit_menu' barcode.id %}"
+               class="btn btn-primary">
+                تعديل المنيو
             </a>
+        </div>
         {% endif %}
-        
+
     {% else %}
-        <p>لا توجد أقسام لهذا المنيو</p>
+        <p class="text-center text-muted">لا توجد أقسام لهذا المنيو</p>
     {% endif %}
 
 </div>
