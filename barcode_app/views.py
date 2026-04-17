@@ -17,35 +17,45 @@ import io
 def create_barcode(request):
     if request.method == "POST":
         form = LinkForm(request.POST)
+
         if form.is_valid():
-            link = form.save(commit=False)
-            link.barcode = Barcode.objects.create(
+            # =========================
+            # إنشاء الباركود
+            # =========================
+            barcode = Barcode.objects.create(
                 title=request.POST.get("title"),
                 user=request.user,
                 type="link"
             )
+
+            link = form.save(commit=False)
+            link.barcode = barcode
             link.save()
 
-            # إنشاء QR
+            # =========================
+            # إنشاء QR ورفعه على Cloudinary
+            # =========================
             qr_data = link.url
             img = qrcode.make(qr_data)
-            barcode_dir = os.path.join(settings.MEDIA_ROOT, "barcodes")
-            os.makedirs(barcode_dir, exist_ok=True)
-            file_name = f"barcode_{link.barcode.id}.png"
-            file_path = os.path.join(barcode_dir, file_name)
-            img.save(file_path)
 
-            link.barcode.qr_code.name = f"barcodes/{file_name}"
-            link.barcode.save(update_fields=["qr_code"])
+            buffer = io.BytesIO()
+            img.save(buffer, format='PNG')
+
+            file_name = f"barcode_{barcode.id}.png"
+
+            barcode.qr_code.save(
+                file_name,
+                ContentFile(buffer.getvalue()),
+                save=True
+            )
 
             messages.success(request, "تم إنشاء اللينك بنجاح ✅")
             return redirect("accounts:dashboard")
+
     else:
         form = LinkForm()
 
     return render(request, "create.html", {"form": form})
-
-
 @login_required
 def minu(request):
     if request.method == "POST":
